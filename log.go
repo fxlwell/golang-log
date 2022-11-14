@@ -52,26 +52,24 @@ func New(ctx context.Context, conf *Conf) *Logger {
 }
 
 func (l *Logger) auto(ctx context.Context) {
-	var (
-		fname    string
-		fp       *os.File
-		deadline time.Time
-		err      error
-	)
-
 	if len(l.conf.LogFile) <= 0 {
 		return
 	}
 
-	fname, deadline = parse_log_fname(l.conf.LogFile)
+	fname, deadline := parse_log_fname(l.conf.LogFile)
 
-	if fp, err = open_log_file(fname); err != nil {
+	fp, err := open_log_file(fname)
+	if err != nil {
 		fp = os.Stderr
 	}
 
 	l.Fptr = fp
 	l.Fname = fname
 	l.SetOutput(fp)
+
+	if l.conf.LogFile == "/dev/null" {
+		return
+	}
 
 	go func() {
 		select {
@@ -129,11 +127,14 @@ func (l *Logger) Fatal(v ...any) {
 	l.pln(LEVEL_FATAL, v...)
 }
 
-var defaultLogger *Logger
-var loggers map[string]*Logger
+var (
+	Default, DevNull *Logger
+	loggers          map[string]*Logger
+)
 
 func init() {
-	defaultLogger = New(context.TODO(), &Conf{"", 0x0, -1, 1})
+	Default = New(context.TODO(), &Conf{"", 0x0, -1, 1})
+	DevNull = New(context.TODO(), &Conf{"/dev/null", 0x0, -1, 1})
 	loggers = make(map[string]*Logger)
 }
 
@@ -147,37 +148,37 @@ func Get(sn string) *Logger {
 	if l, ok := loggers[sn]; ok {
 		return l
 	}
-	return defaultLogger
+	return Default
 }
 
 func Debugf(f string, v ...any) {
-	defaultLogger.Debugf(f, v...)
+	Default.Debugf(f, v...)
 }
 
 func Debug(v ...any) {
-	defaultLogger.Debug(v...)
+	Default.Debug(v...)
 }
 
 func Infof(f string, v ...any) {
-	defaultLogger.Infof(f, v...)
+	Default.Infof(f, v...)
 }
 
 func Info(v ...any) {
-	defaultLogger.Info(v...)
+	Default.Info(v...)
 }
 
 func Warnf(f string, v ...any) {
-	defaultLogger.Warnf(f, v...)
+	Default.Warnf(f, v...)
 }
 
 func Warn(v ...any) {
-	defaultLogger.Warn(v...)
+	Default.Warn(v...)
 }
 
 func Fatalf(f string, v ...any) {
-	defaultLogger.Fatalf(f, v...)
+	Default.Fatalf(f, v...)
 }
 
 func Fatal(v ...any) {
-	defaultLogger.Fatal(v...)
+	Default.Fatal(v...)
 }

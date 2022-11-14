@@ -141,3 +141,7 @@ func TestLoggers(t *testing.T) {
 	os.Remove(Get("state").Fname)
 	os.Remove(Get("error").Fname)
 }
+
+func TestDevNull(t *testing.T) {
+	DevNull.Infof("DevLog")
+}
