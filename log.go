@@ -128,12 +128,12 @@ func (l *Logger) Fatal(v ...any) {
 }
 
 var (
-	Default, DevNull *Logger
-	loggers          map[string]*Logger
+	defaultLogger, DevNull *Logger
+	loggers                map[string]*Logger
 )
 
 func init() {
-	Default = New(context.TODO(), &Conf{"", 0x0, -1, 1})
+	defaultLogger = New(context.TODO(), &Conf{"", 0x0, -1, 1})
 	DevNull = New(context.TODO(), &Conf{"/dev/null", 0x0, -1, 1})
 	loggers = make(map[string]*Logger)
 }
@@ -148,37 +148,37 @@ func Get(sn string) *Logger {
 	if l, ok := loggers[sn]; ok {
 		return l
 	}
-	return Default
+	return defaultLogger
 }
 
 func Debugf(f string, v ...any) {
-	Default.Debugf(f, v...)
+	defaultLogger.Debugf(f, v...)
 }
 
 func Debug(v ...any) {
-	Default.Debug(v...)
+	defaultLogger.Debug(v...)
 }
 
 func Infof(f string, v ...any) {
-	Default.Infof(f, v...)
+	defaultLogger.Infof(f, v...)
 }
 
 func Info(v ...any) {
-	Default.Info(v...)
+	defaultLogger.Info(v...)
 }
 
 func Warnf(f string, v ...any) {
-	Default.Warnf(f, v...)
+	defaultLogger.Warnf(f, v...)
 }
 
 func Warn(v ...any) {
-	Default.Warn(v...)
+	defaultLogger.Warn(v...)
 }
 
 func Fatalf(f string, v ...any) {
-	Default.Fatalf(f, v...)
+	defaultLogger.Fatalf(f, v...)
 }
 
 func Fatal(v ...any) {
-	Default.Fatal(v...)
+	defaultLogger.Fatal(v...)
 }
